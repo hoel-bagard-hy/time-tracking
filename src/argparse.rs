@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use clap::{Parser, Subcommand, ValueEnum};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
-pub enum Mode {
+pub enum ReportMode {
     /// Print all the tasks present in the timesheet.
     TaskNames,
     /// Print how much time was spend on each task
@@ -45,9 +45,8 @@ pub enum Commands {
     /// Report information entered in the timesheet in a way that is easy to copy/paste into the excel sheet.
     Report {
         /// Action to perform.
-        mode: Mode,
+        mode: ReportMode,
         /// Date for which to retrieve the timesheet, using the %Y-%m-%d format. For example: "2015-09-05".
-        /// Transform to date using `NaiveDate::parse_from_str`
         target_date: String,
     },
 }
