@@ -42,7 +42,7 @@ pub fn log_start(task_name: &str, timesheet_path: &PathBuf) -> Result<()> {
     Ok(())
 }
 
-/// Log the task name along with the current time stamp to the given file.
+/// End the last task and start a new one.
 pub fn log_switch(task_name: &str, timesheet_path: &PathBuf) -> Result<()> {
     if !timesheet_path.try_exists()? {
         bail!("File not found {}", timesheet_path.to_string_lossy());
@@ -54,8 +54,6 @@ pub fn log_switch(task_name: &str, timesheet_path: &PathBuf) -> Result<()> {
     let lines: Vec<String> = reader.lines().collect::<Result<_, _>>()?;
 
     if let Some(last_line) = lines.last() {
-        let current_time = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
-
         if last_line.split(',').count() != 2 {
             bail!("No start time found: {}.", last_line);
         }
@@ -67,10 +65,45 @@ pub fn log_switch(task_name: &str, timesheet_path: &PathBuf) -> Result<()> {
             writeln!(file, "{line}")?;
         }
 
+        let current_time = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
+
         // End the previous task.
         writeln!(file, "{},{}", last_line.trim_end(), current_time)?;
         // Start the next one.
         write!(file, "{task_name},{current_time}")?;
+    } else {
+        bail!("Log file exists but is empty. Cannot start with an end time.");
+    }
+
+    Ok(())
+}
+
+/// End current task.
+pub fn log_end(timesheet_path: &PathBuf) -> Result<()> {
+    if !timesheet_path.try_exists()? {
+        bail!("File not found {}", timesheet_path.to_string_lossy());
+    }
+
+    // Check that there is a start time.
+    let file = File::open(timesheet_path)?;
+    let reader = BufReader::new(&file);
+    let lines: Vec<String> = reader.lines().collect::<Result<_, _>>()?;
+
+    if let Some(last_line) = lines.last() {
+        if last_line.split(',').count() != 1 {
+            bail!("No start time found: {}.", last_line);
+        }
+
+        // In case there is already a newline after the start time, rewrite the file with all the lines except the last one, then add the modified last line.
+        // This is simpler than overwriting only the last line, and does not really matter given the size of the file.
+        let mut file = File::create(timesheet_path)?;
+        for line in &lines[..lines.len() - 1] {
+            writeln!(file, "{line}")?;
+        }
+
+        let current_time = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
+
+        writeln!(file, "{},{}", last_line.trim_end(), current_time)?;
     } else {
         bail!("Log file exists but is empty. Cannot start with an end time.");
     }
