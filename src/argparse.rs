@@ -2,22 +2,6 @@ use std::path::PathBuf;
 
 use clap::{Parser, Subcommand, ValueEnum};
 
-#[derive(Subcommand, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub enum Action {
-    /// Starting to work.
-    Start {
-        /// Task name
-        task_name: String,
-    },
-    ///Switching to another task
-    Switch {
-        /// Task name
-        task_name: String,
-    },
-    /// Finished working.
-    End,
-}
-
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
 pub enum Mode {
     /// Print all the tasks present in the timesheet.
@@ -43,11 +27,20 @@ pub struct Cli {
 
 #[derive(Subcommand, Debug)]
 pub enum Commands {
-    /// Log worked hours.
-    Log {
-        #[command(subcommand)]
-        action: Action,
+    /// Starting to work.
+    Start {
+        /// Task name
+        task_name: String,
     },
+
+    ///Switching to another task.
+    Switch {
+        /// Task name
+        task_name: String,
+    },
+
+    /// Finished working.
+    End,
 
     /// Report information entered in the timesheet in a way that is easy to copy/paste into the excel sheet.
     Report {

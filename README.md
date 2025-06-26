@@ -58,19 +58,19 @@ The log mode is used to recording start/end time of each task.
 In the morning/after lunch/after a break:
 
 ```bash
-time-tracking log start <task name>
+time-tracking start <task name>
 ```
 
 When switching to another task:
 
 ```bash
-time-tracking log switch <task name>
+time-tracking switch <task name>
 ```
 
 When taking a break or at the end of the day:
 
 ```bash
-time-tracking log end
+time-tracking end
 ```
 
 ### Recommended aliases
