@@ -13,16 +13,16 @@ pub enum Mode {
 #[derive(Parser, Debug)]
 #[command(author, version, about)]
 pub struct Cli {
-    #[command(subcommand)]
-    pub command: Commands,
-
     /// Path to the timesheet.
     #[arg(
         short('l'),
         long,
         default_value("~/.local/share/time-tracking/timesheet.csv")
     )]
-    timesheet_path: Option<PathBuf>,
+    pub timesheet_path: PathBuf,
+
+    #[command(subcommand)]
+    pub command: Commands,
 }
 
 #[derive(Subcommand, Debug)]
