@@ -17,7 +17,7 @@ pub struct Cli {
     #[arg(
         short('l'),
         long,
-        default_value("~/.local/share/time-tracking/timesheet.csv")
+        default_value=dirs::home_dir().unwrap().join(".local/share/time-tracking/timesheet.csv").into_os_string()
     )]
     pub timesheet_path: PathBuf,
 
