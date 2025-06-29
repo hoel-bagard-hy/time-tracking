@@ -1,5 +1,6 @@
 use std::fs::{File, OpenOptions};
 use std::io::{self, BufRead, BufReader, Write};
+use std::path::Path;
 use std::path::PathBuf;
 
 use anyhow::{Result, bail};
@@ -29,6 +30,7 @@ pub fn log_start(task_name: &str, timesheet_path: &PathBuf) -> Result<()> {
         io::stdin().read_line(&mut input)?;
 
         if input.trim().eq_ignore_ascii_case("y") || input.trim().is_empty() {
+            std::fs::create_dir_all(timesheet_path.parent().unwrap_or_else(|| Path::new("")))?;
             File::create(timesheet_path)?
         } else {
             println!("File not created, exiting.");
