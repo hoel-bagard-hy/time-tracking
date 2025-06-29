@@ -24,7 +24,7 @@ fn main() -> Result<()> {
         }
         Commands::Report { mode, target_date } => {
             let worked_times = process_csv(&cli.timesheet_path, target_date)?;
-            print_report(mode, worked_times);
+            print_report(*mode, &worked_times);
         }
     }
     Ok(())

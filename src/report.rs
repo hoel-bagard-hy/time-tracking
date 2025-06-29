@@ -5,7 +5,7 @@ use std::{
 };
 
 use anyhow::{Result, bail};
-use chrono::{Datelike, Duration, NaiveDate, NaiveDateTime, TimeDelta, Timelike};
+use chrono::{NaiveDate, NaiveDateTime, TimeDelta};
 
 use crate::argparse::ReportMode;
 
@@ -55,7 +55,7 @@ pub fn process_csv(
     clippy::cast_possible_truncation,
     clippy::expect_used
 )]
-pub fn print_report(mode: &ReportMode, worked_times: HashMap<String, TimeDelta>) {
+pub fn print_report(mode: ReportMode, worked_times: &HashMap<String, TimeDelta>) {
     let mut tasks: Vec<&String> = worked_times.keys().collect();
     tasks.sort();
     match mode {
