@@ -92,7 +92,7 @@ pub fn log_end(timesheet_path: &PathBuf) -> Result<()> {
     let lines: Vec<String> = reader.lines().collect::<Result<_, _>>()?;
 
     if let Some(last_line) = lines.last() {
-        if last_line.split(',').count() != 1 {
+        if last_line.split(',').count() != 2 {
             bail!("No start time found: {}.", last_line);
         }
 
