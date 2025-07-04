@@ -29,6 +29,9 @@ pub fn process_csv(
         let end_time = NaiveDateTime::parse_from_str(end_time_str, "%Y-%m-%d %H:%M:%S")?;
 
         if start_time.date() != target_date {
+            worked_times
+                .entry(task.to_owned())
+                .or_insert(TimeDelta::zero());
             continue;
         }
 
