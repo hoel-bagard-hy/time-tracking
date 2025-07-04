@@ -66,7 +66,18 @@ pub fn print_report(mode: ReportMode, worked_times: &HashMap<String, TimeDelta>)
         }
         ReportMode::Times => {
             for task in tasks {
-                println!("{}", worked_times.get(task).unwrap_or(&TimeDelta::zero()));
+                println!(
+                    "{}h{:02}min",
+                    worked_times
+                        .get(task)
+                        .unwrap_or(&TimeDelta::zero())
+                        .num_hours(),
+                    worked_times
+                        .get(task)
+                        .unwrap_or(&TimeDelta::zero())
+                        .num_minutes()
+                        % 60
+                );
             }
         }
     }
