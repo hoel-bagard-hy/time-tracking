@@ -7,17 +7,17 @@ use std::{
 use anyhow::{Result, bail};
 use chrono::{NaiveDate, NaiveDateTime, TimeDelta};
 
-use crate::argparse::ReportMode;
-
 /// Read a CSV written by the log command, and print out its content in a way that is easily copy/pastable into an excel sheet.
 #[allow(clippy::expect_used)]
 pub fn process_csv(
     log_file_path: &PathBuf,
-    target_date: &str,
+    target_date: Option<&str>,
 ) -> Result<HashMap<String, TimeDelta>> {
     // Map each task to the total amount of time worked.
     let mut worked_times = HashMap::new();
-    let target_date = NaiveDate::parse_from_str(target_date, "%Y-%m-%d")?;
+    let target_date = target_date
+        .map(|value| NaiveDate::parse_from_str(value, "%Y-%m-%d"))
+        .transpose()?;
 
     for line in fs::read_to_string(log_file_path)?.lines() {
         let [task, start_time_str, end_time_str] = line.split(',').collect::<Vec<&str>>()[..]
@@ -28,7 +28,7 @@ pub fn process_csv(
         let start_time = NaiveDateTime::parse_from_str(start_time_str, "%Y-%m-%d %H:%M:%S")?;
         let end_time = NaiveDateTime::parse_from_str(end_time_str, "%Y-%m-%d %H:%M:%S")?;
 
-        if start_time.date() != target_date {
+        if target_date.is_some_and(|value| start_time.date() != value) {
             worked_times
                 .entry(task.to_owned())
                 .or_insert(TimeDelta::zero());
@@ -52,36 +52,33 @@ pub fn process_csv(
     Ok(worked_times)
 }
 
-#[allow(
-    clippy::cast_precision_loss,
-    clippy::cast_sign_loss,
-    clippy::cast_possible_truncation,
-    clippy::expect_used
-)]
-pub fn print_report(mode: ReportMode, worked_times: &HashMap<String, TimeDelta>) {
+/// Print how much time was spend on each task
+pub fn print_times(worked_times: &HashMap<String, TimeDelta>) {
     let mut tasks: Vec<&String> = worked_times.keys().collect();
     tasks.sort();
-    match mode {
-        ReportMode::TaskNames => {
-            for task in tasks {
-                println!("{task}");
-            }
-        }
-        ReportMode::Times => {
-            for task in tasks {
-                println!(
-                    "{}h{:02}min",
-                    worked_times
-                        .get(task)
-                        .unwrap_or(&TimeDelta::zero())
-                        .num_hours(),
-                    worked_times
-                        .get(task)
-                        .unwrap_or(&TimeDelta::zero())
-                        .num_minutes()
-                        % 60
-                );
-            }
-        }
+
+    for task in tasks {
+        println!(
+            "{}h{:02}min",
+            worked_times
+                .get(task)
+                .unwrap_or(&TimeDelta::zero())
+                .num_hours(),
+            worked_times
+                .get(task)
+                .unwrap_or(&TimeDelta::zero())
+                .num_minutes()
+                % 60
+        );
+    }
+}
+
+/// Print all the tasks present in the timesheet.
+pub fn print_tasks(worked_times: &HashMap<String, TimeDelta>) {
+    let mut tasks: Vec<&String> = worked_times.keys().collect();
+    tasks.sort();
+
+    for task in tasks {
+        println!("{task}");
     }
 }

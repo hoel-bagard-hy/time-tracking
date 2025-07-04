@@ -73,11 +73,24 @@ When taking a break or at the end of the day:
 time-tracking end
 ```
 
-### Recommended aliases
-
 ### Report mode
 
-TODO
+Display the tasks that have been registered:
+
+```bash
+time-tracking task-names
+```
+
+Display the time spent on each task during a given day:
+
+```bash
+time-tracking times <date>
+```
+
+Notes:
+
+- The date should follow the format `yyyy-mm-dd`. For example `2025-07-01`
+- The times order matches the task names order.
 
 ## File format
 

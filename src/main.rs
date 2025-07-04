@@ -2,7 +2,7 @@
 use anyhow::Result;
 use clap::Parser;
 use log::{log_end, log_start, log_switch};
-use report::{print_report, process_csv};
+use report::{print_tasks, print_times, process_csv};
 
 mod argparse;
 mod log;
@@ -22,9 +22,13 @@ fn main() -> Result<()> {
         Commands::End => {
             log_end(&cli.timesheet_path)?;
         }
-        Commands::Report { mode, target_date } => {
-            let worked_times = process_csv(&cli.timesheet_path, target_date)?;
-            print_report(*mode, &worked_times);
+        Commands::TaskNames => {
+            let worked_times = process_csv(&cli.timesheet_path, None)?;
+            print_tasks(&worked_times);
+        }
+        Commands::Times { target_date } => {
+            let worked_times = process_csv(&cli.timesheet_path, Some(&target_date))?;
+            print_times(&worked_times);
         }
     }
     Ok(())
